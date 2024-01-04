@@ -1,0 +1,16 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+button:active {
+  transform: scale(1.05);
+}
+svg:active {
+  transform: scale(1.05);
+}
