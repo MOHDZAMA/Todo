@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./style.css";
-
 import {
   MdEditAttributes,
   MdOutlineEditAttributes,
@@ -13,13 +12,24 @@ function Container() {
   const [tasks, setTasks] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState([]);
+  const inputRef = useRef(false);
 
   useEffect(() => {
-    const b = JSON.stringify(tasks);
-    localStorage.setItem("tasks", b);
-    setSearch(tasks);
-  }, [tasks]);
+    const a = localStorage.getItem("tasks");
+    const b = JSON.parse(a);
+    if (a !== null) {
+      setTasks(b);
+      setSearch(b);
+    }
+  }, []);
 
+  useEffect(() => {
+    if (inputRef.current) {
+      const a = JSON.stringify(tasks);
+      localStorage.setItem("tasks", a);
+    }
+    inputRef.current = true;
+  }, [tasks]);
   function addTask() {
     const newTask = {
       task: inputValue,
@@ -30,9 +40,8 @@ function Container() {
 
     if (newTask.task.length > 0) {
       setTasks((prevTasks) => [...prevTasks, newTask]);
+      setSearch((prevTasks) => [...prevTasks, newTask]);
       setInputValue("");
-      const b = JSON.stringify(...tasks, newTask);
-      localStorage.setItem("tasks", b);
     }
   }
 
@@ -63,6 +72,46 @@ function Container() {
     }
   }
 
+  function editTask(index) {
+    const newTasks = [...tasks];
+    newTasks[index].isEdit = !newTasks[index].isEdit;
+    setTasks(newTasks);
+    setSearch(newTasks);
+  }
+
+  function allComplete() {
+    const updatedTasks = tasks.map((task) => ({
+      ...task,
+      isComplete: true,
+    }));
+
+    setTasks(updatedTasks);
+    setSearch(updatedTasks);
+  }
+  function deleteTask(index) {
+    const newTasks = [...tasks];
+    newTasks.splice(index, 1);
+    setTasks(newTasks);
+    setSearch(newTasks);
+  }
+
+  function completeTask(index) {
+    const newTasks = [...tasks];
+    newTasks[index].isComplete = !newTasks[index].isComplete;
+    setTasks(newTasks);
+    setSearch(newTasks);
+  }
+
+  function updateTasks(index) {
+    const task = document.getElementById("edit").value;
+    const newTasks = [...tasks];
+    newTasks[index].task = task;
+    setTasks(newTasks);
+    setSearch(newTasks);
+    newTasks[index].isEdit = !newTasks[index].isEdit;
+    const b = JSON.stringify([...tasks, newTasks]);
+  }
+
   // function updateTasks(index) {
   // const newTaskValue = document.getElementById("edit").value;
   //
@@ -80,14 +129,6 @@ function Container() {
   // editTask(index);
   // }
 
-  function updateTasks(index) {
-    const task = document.getElementById("edit").value;
-    const newTasks = [...tasks];
-    newTasks[index].task = task;
-    setTasks(newTasks);
-    newTasks[index].isEdit = !newTasks[index].isEdit;
-    const b = JSON.stringify([...tasks, newTasks]);
-  }
   // function editTask(index) {
   // console.log("start");
   // const updatedTasks = tasks.map((task, i) => {
@@ -100,31 +141,6 @@ function Container() {
   // setTasks(updatedTasks);
   // console.log(updatedTasks);
   // }
-  function editTask(index) {
-    const newTasks = [...tasks];
-    newTasks[index].isEdit = !newTasks[index].isEdit;
-    setTasks(newTasks);
-  }
-
-  function allComplete() {
-    const updatedTasks = tasks.map((task) => ({
-      ...task,
-      isComplete: true,
-    }));
-
-    setTasks(updatedTasks);
-  }
-  function deleteTask(index) {
-    const newTasks = [...tasks];
-    newTasks.splice(index, 1);
-    setTasks(newTasks);
-  }
-
-  function completeTask(index) {
-    const newTasks = [...tasks];
-    newTasks[index].isComplete = !newTasks[index].isComplete;
-    setTasks(newTasks);
-  }
 
   return (
     <div className="container">
