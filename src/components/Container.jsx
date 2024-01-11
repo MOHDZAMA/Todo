@@ -88,6 +88,7 @@ function Container() {
     setTasks(updatedTasks);
     setSearch(updatedTasks);
   }
+
   function deleteTask(index) {
     const newTasks = [...tasks];
     newTasks.splice(index, 1);
