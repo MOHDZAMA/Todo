@@ -3,12 +3,13 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 
-import { TaskProvider } from "./components/contexApi/Contex.jsx";
+import { store } from "./store/store";
+import { Provider } from "react-redux";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <>
-    <TaskProvider>
+    <Provider store={store}>
       <App />
-    </TaskProvider>
+    </Provider>
   </>
 );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./style.css";
 import {
   MdEditAttributes,
@@ -7,56 +7,33 @@ import {
   MdCheckBox,
 } from "react-icons/md";
 
-import useTask from "../components/hooks/useTask";
+import { useSelector, useDispatch } from "react-redux";
+import { deleteTask, completeTask, updateTask } from "../store/taskSlice";
 
 function Tasks() {
-  const { tasks, setTasks, search, setSearch } = useTask();
   const [editValue, setEditValue] = useState("");
+  const tasks = useSelector((state) => state.task.task);
+  const search = useSelector((state) => state.task.search);
 
-  function deleteTask(index) {
-    const newTasks = [...tasks];
-    newTasks.splice(index, 1);
-    setTasks(newTasks);
-    setSearch(newTasks);
-  }
+  const dispatch = useDispatch();
+  console.log(search);
 
-  function completeTask(index) {
-    const newTasks = [...tasks];
-    newTasks[index].isComplete = !newTasks[index].isComplete;
-    setTasks(newTasks);
-    setSearch(newTasks);
-  }
-
-  function updateTasks(index) {
-    const newTasks = [...tasks];
-    newTasks[index].task = editValue;
-    setTasks(newTasks);
-    setSearch(newTasks);
-    newTasks[index].isEdit = !newTasks[index].isEdit;
-  }
-
-  function editTask(index) {
-    const newTasks = [...tasks];
-    newTasks[index].isEdit = !newTasks[index].isEdit;
-    setTasks(newTasks);
-    setSearch(newTasks);
-  }
   return (
     <div className="items">
-      {search?.map((tasks, index) => (
-        <div className="item" key={index}>
+      {(search.length > 0 ? search : tasks)?.map((task, index) => (
+        <div className="item" key={task.id}>
           <div className="item-left">
             <span>{index + 1 + ". "} </span>
-            {!tasks.isEdit ? (
-              tasks.isComplete ? (
-                <strike>{tasks.task}</strike>
+            {!task.isEdit ? (
+              task.isComplete ? (
+                <strike>{task.task.inputValue}</strike>
               ) : (
-                <span>{tasks.task}</span>
+                <span>{task.task.inputValue}</span>
               )
             ) : (
               <input
                 type="text"
-                defaultValue={tasks.task}
+                defaultValue={task.task.inputValue}
                 onChange={(e) => setEditValue(e.target.value)}
                 autoComplete="off"
                 autoCorrect="off"
@@ -64,24 +41,31 @@ function Tasks() {
             )}
           </div>
           <div className="item-right">
-            {!tasks.isEdit ? (
+            {!task.isEdit ? (
               <i>
-                <MdEditAttributes onClick={() => editTask(index)} />
+                <MdEditAttributes
+                  onClick={() => {
+                    dispatch(updateTask([task.id, task.task.inputValue])),
+                      setEditValue(task.task.inputValue);
+                  }}
+                />
               </i>
             ) : (
               <i>
                 <MdOutlineEditAttributes
-                  onClick={() => updateTasks(index) && editTask(index)}
+                  onClick={() => {
+                    dispatch(updateTask([task.id, editValue]));
+                  }}
                 />
               </i>
             )}
 
             <i>
-              <MdDeleteForever onClick={() => deleteTask(index)} />
+              <MdDeleteForever onClick={() => dispatch(deleteTask(task.id))} />
             </i>
 
             <i>
-              <MdCheckBox onClick={() => completeTask(index)} />
+              <MdCheckBox onClick={() => dispatch(completeTask(task.id))} />
             </i>
           </div>
         </div>
